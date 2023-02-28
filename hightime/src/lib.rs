@@ -9,8 +9,23 @@
 //! This is a work in progress.
 //! Currently I am working out the API definitions.
 //! See the git repository for more information.
+#![deny(unsafe_code)]
+#![warn(
+    missing_docs,
+    rust_2018_idioms,
+    trivial_casts,
+    unused_lifetimes,
+    unused_results
+)]
+#![cfg_attr(not(feature = "std"), no_std)]
+
 mod date;
 mod error;
 
 pub use date::NaiveDate;
 pub use error::Error;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+}

@@ -1,4 +1,18 @@
+#[cfg(feature = "std")]
+use std::time::SystemTime;
+
 use crate::Error;
+
+/// A day of the week.
+pub enum Weekday {
+    Monday = 1,
+    Tuesday = 2,
+    Wednesday = 3,
+    Thursday = 4,
+    Friday = 5,
+    Saturday = 6,
+    Sunday = 7,
+}
 
 /// A date without time zone information.
 pub struct NaiveDate {}
@@ -14,15 +28,38 @@ impl NaiveDate {
     ///
     /// # Errors
     ///
-    /// An error is returned if the date does not exists, e.g. April 31st of a given year.
+    /// An error is returned if the date does not exist, e.g. April 31st of a given year.
     // TODO: which error variant?
     pub fn from_ymd(_year: i32, _month: u32, _day: u32) -> Result<Self, Error> {
+        todo!()
+    }
+
+    /// Returns a [NaiveDate] from the ISO week date.
+    ///
+    /// `year` is the Gregorian ordinal year.
+    ///
+    /// `week` is the ISO week number.
+    ///
+    /// `day` is the [Weekday].
+    ///
+    /// # Errors
+    ///
+    /// An error is returned if the date does not exist or is out of range.
+    // TODO: which variant?
+    pub fn from_iso_ywd(_year: i32, _week: u32, _day: Weekday) -> Result<Self, Error> {
         todo!()
     }
 
     /// Returns a [NaiveDate] from the current system time.
     #[cfg(feature = "std")]
     pub fn today() -> Self {
+        todo!()
+    }
+}
+
+#[cfg(feature = "std")]
+impl From<SystemTime> for NaiveDate {
+    fn from(_val: SystemTime) -> Self {
         todo!()
     }
 }
