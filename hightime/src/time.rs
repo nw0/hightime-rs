@@ -1,4 +1,4 @@
-use crate::{Error, Date};
+use crate::{Date, Error};
 
 /// Clock time within a date, without a time zone.
 pub struct NaiveTime {}

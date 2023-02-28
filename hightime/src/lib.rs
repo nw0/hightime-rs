@@ -32,8 +32,3 @@ pub use date::{Date, Weekday};
 pub use error::Error;
 #[cfg(feature = "unstable")]
 pub use time::{DateTime, FixedOffset, NaiveTime, Offset};
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-}
