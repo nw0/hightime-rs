@@ -21,9 +21,11 @@
 
 mod date;
 mod error;
+mod time;
 
-pub use date::NaiveDate;
+pub use date::{NaiveDate, Weekday};
 pub use error::Error;
+pub use time::{DateTime, NaiveTime};
 
 #[cfg(test)]
 mod tests {
