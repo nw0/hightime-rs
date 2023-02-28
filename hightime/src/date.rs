@@ -22,10 +22,10 @@ pub enum Weekday {
 }
 
 /// A date without time zone information.
-pub struct NaiveDate {}
+pub struct Date {}
 
-impl NaiveDate {
-    /// Returns a [NaiveDate] from the calendar date.
+impl Date {
+    /// Returns a [Date] from the calendar date.
     ///
     /// `year` is the Gregorian ordinal year.
     ///
@@ -41,7 +41,7 @@ impl NaiveDate {
         todo!()
     }
 
-    /// Returns a [NaiveDate] from the ISO week date.
+    /// Returns a [Date] from the ISO week date.
     ///
     /// `year` is the Gregorian ordinal year.
     ///
@@ -57,7 +57,7 @@ impl NaiveDate {
         todo!()
     }
 
-    /// Returns a [NaiveDate] from the current system time.
+    /// Returns a [Date] from the current system time.
     #[cfg(feature = "std")]
     pub fn today() -> Self {
         todo!()
@@ -65,7 +65,7 @@ impl NaiveDate {
 }
 
 #[cfg(feature = "std")]
-impl From<SystemTime> for NaiveDate {
+impl From<SystemTime> for Date {
     fn from(_val: SystemTime) -> Self {
         todo!()
     }

@@ -27,7 +27,7 @@ mod error;
 mod time;
 
 #[cfg(feature = "unstable")]
-pub use date::{NaiveDate, Weekday};
+pub use date::{Date, Weekday};
 #[cfg(feature = "unstable")]
 pub use error::Error;
 #[cfg(feature = "unstable")]

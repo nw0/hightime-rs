@@ -1,4 +1,4 @@
-use crate::{Error, NaiveDate};
+use crate::{Error, Date};
 
 /// Clock time within a date, without a time zone.
 pub struct NaiveTime {}
@@ -44,13 +44,13 @@ pub struct DateTime<O: Offset> {
 }
 
 impl<O: Offset> DateTime<O> {
-    /// Returns a [DateTime] from a [NaiveDate], a [NaiveTime], and an offset.
+    /// Returns a [DateTime] from a [Date], a [NaiveTime], and an offset.
     ///
     /// # Errors
     ///
     /// This should not result in an error as yet, but may cause an error
     /// once time zone information has been implemented, if the range is invalid.
-    pub fn new(_date: NaiveDate, _time: NaiveTime) -> Result<Self, Error> {
+    pub fn new(_date: Date, _time: NaiveTime) -> Result<Self, Error> {
         todo!()
     }
 
