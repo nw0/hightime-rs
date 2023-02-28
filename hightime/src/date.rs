@@ -5,12 +5,19 @@ use crate::Error;
 
 /// A day of the week.
 pub enum Weekday {
+    #[allow(missing_docs)]
     Monday = 1,
+    #[allow(missing_docs)]
     Tuesday = 2,
+    #[allow(missing_docs)]
     Wednesday = 3,
+    #[allow(missing_docs)]
     Thursday = 4,
+    #[allow(missing_docs)]
     Friday = 5,
+    #[allow(missing_docs)]
     Saturday = 6,
+    #[allow(missing_docs)]
     Sunday = 7,
 }
 
