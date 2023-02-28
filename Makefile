@@ -1,4 +1,12 @@
-.PHONY: publish
+.PHONY: check clippy publish
+
+check:
+	cargo check
+	cargo check --features=std
+
+clippy:
+	cargo clippy
+	cargo clippy --features=std
 
 publish: README.md
 	cargo publish -p hightime
