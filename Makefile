@@ -1,12 +1,12 @@
 .PHONY: check clippy publish
 
 check:
-	cargo check
-	cargo check --features=std
+	cargo check --features=unstable
+	cargo check --features=unstable,std
 
 clippy:
-	cargo clippy
-	cargo clippy --features=std
+	cargo clippy --features=unstable
+	cargo clippy --features=unstable,std
 
 publish: README.md
 	cargo publish -p hightime

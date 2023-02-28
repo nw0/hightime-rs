@@ -12,5 +12,6 @@ readme = "../README.md"
 
 [features]
 std = []
+unstable = []
 
 [dependencies]
