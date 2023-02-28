@@ -1,14 +1,12 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+//! A high-level time library for Rust.
+//!
+//! `hightime` aims to be:
+//!
+//! - Simple and API-stable
+//! - Well-documented
+//! - Minimal in implementation and dependencies
+mod date;
+mod error;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use date::NaiveDate;
+pub use error::Error;
