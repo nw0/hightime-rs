@@ -7,6 +7,7 @@ impl NaiveDate {
         todo!()
     }
 
+    #[cfg(feature = "std")]
     pub fn today() -> Self {
         todo!()
     }
