@@ -14,5 +14,5 @@ test:
 publish: README.md test
 	cargo publish -p hightime
 
-README.md: hightime/src/lib.rs
-	cargo readme -r hightime > README.md
+README.md: .README.tpl Cargo.toml hightime/Cargo.toml hightime/src/lib.rs
+	cargo readme --template ../$< -o ../$@ -r hightime
