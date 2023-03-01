@@ -3,7 +3,40 @@ use std::time::SystemTime;
 
 use crate::Error;
 
+pub type IsoWeekday = u8;
+
+impl From<Weekday> for IsoWeekday {
+    fn from(val: Weekday) -> Self {
+        match val {
+            Weekday::Monday => 1,
+            Weekday::Tuesday => 2,
+            Weekday::Wednesday => 3,
+            Weekday::Thursday => 4,
+            Weekday::Friday => 5,
+            Weekday::Saturday => 6,
+            Weekday::Sunday => 7,
+        }
+    }
+}
+
+impl TryFrom<IsoWeekday> for Weekday {
+    type Error = Error;
+    fn try_from(val: IsoWeekday) -> Result<Self, Self::Error> {
+        match val {
+            1 => Ok(Self::Monday),
+            2 => Ok(Self::Tuesday),
+            3 => Ok(Self::Wednesday),
+            4 => Ok(Self::Thursday),
+            5 => Ok(Self::Friday),
+            6 => Ok(Self::Saturday),
+            7 => Ok(Self::Sunday),
+            _ => Err(Error::RangeExceeded),
+        }
+    }
+}
+
 /// A day of the week.
+#[derive(Debug, Eq, PartialEq)]
 pub enum Weekday {
     #[allow(missing_docs)]
     Monday = 1,
@@ -18,7 +51,7 @@ pub enum Weekday {
     #[allow(missing_docs)]
     Saturday = 6,
     #[allow(missing_docs)]
-    Sunday = 7,
+    Sunday = 0,
 }
 
 /// A date in the proleptic Gregorian calendar.
@@ -88,7 +121,14 @@ impl Date {
 
     /// Returns the weekday.
     pub fn weekday(&self) -> Weekday {
-        todo!()
+        let y = self.year - 1;
+        let d = self.day as i32;
+        (match (d + 5 * (y % 4) + 4 * (y % 100) + 6 * (y % 400)) % 7 {
+            0 => 7,
+            i => i,
+        } as IsoWeekday)
+            .try_into()
+            .expect("can't be out of range")
     }
 
     fn md(&self) -> (u8, u8) {
@@ -204,5 +244,17 @@ mod tests {
         assert_eq!(Date::from_ymd(2003, 3, 1).unwrap().day_ord(), 60);
         assert_eq!(Date::from_ymd(2002, 12, 31).unwrap().day_ord(), 365);
         assert_eq!(Date::from_ymd(2004, 12, 31).unwrap().day_ord(), 366);
+    }
+
+    #[test]
+    fn date_weekday() {
+        assert_eq!(
+            Date::from_ymd(2023, 3, 1).unwrap().weekday(),
+            Weekday::Wednesday
+        );
+        assert_eq!(
+            Date::from_ymd(1200, 4, 28).unwrap().weekday(),
+            Weekday::Friday
+        );
     }
 }
