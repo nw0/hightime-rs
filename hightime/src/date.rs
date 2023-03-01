@@ -24,6 +24,7 @@ pub enum Weekday {
 /// A date in the proleptic Gregorian calendar.
 ///
 /// Years in the range `-999_999_999..=999_999_999` are supported.
+#[derive(Debug, Eq, PartialEq)]
 pub struct Date {
     /// The ordinal day within the year.
     day: u16,
@@ -33,6 +34,9 @@ pub struct Date {
 }
 
 impl Date {
+    const MONTH_END: [u16; 13] = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
+    const MONTH_END_LEAP: [u16; 13] = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366];
+
     /// Returns a [Date] from the calendar date.
     ///
     /// `year` is the Gregorian ordinal year.
@@ -45,8 +49,19 @@ impl Date {
     ///
     /// An error is returned if the date does not exist, e.g. April 31st of a given year.
     // TODO: which error variant?
-    pub fn from_ymd(_year: i32, _month: u32, _day: u32) -> Result<Self, Error> {
-        todo!()
+    pub fn from_ymd(year: i32, month: u8, day: u8) -> Result<Self, Error> {
+        if year < -999_999_999 || 999_999_999 < year {
+            return Err(Error::UnsupportedYear);
+        }
+        if month < 1 || 12 < month || day < 1 {
+            return Err(Error::RangeExceeded);
+        }
+        let month_ends = Self::month_ends(year);
+        let day = month_ends[month as usize - 1] + day as u16;
+        if day > month_ends[month as usize] {
+            return Err(Error::RangeExceeded);
+        }
+        Ok(Self { year, day })
     }
 
     /// Returns a [Date] from the ISO week date.
@@ -71,19 +86,16 @@ impl Date {
         todo!()
     }
 
-    fn md(&self) -> (u8, u8) {
-        const DAYS_BEFORE: [u16; 12] = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-        const DAYS_BEFORE_LEAP: [u16; 12] = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
+    /// Returns the weekday.
+    pub fn weekday(&self) -> Weekday {
+        todo!()
+    }
 
-        if self.is_leap_year() {
-            let m = DAYS_BEFORE_LEAP.partition_point(|&d| d < self.day);
-            let d = self.day - DAYS_BEFORE_LEAP[m - 1];
-            (m as u8, d as u8)
-        } else {
-            let m = DAYS_BEFORE.partition_point(|&d| d < self.day);
-            let d = self.day - DAYS_BEFORE[m - 1];
-            (m as u8, d as u8)
-        }
+    fn md(&self) -> (u8, u8) {
+        let month_ends = Self::month_ends(self.year);
+        let m = month_ends.partition_point(|&d| d < self.day);
+        let d = self.day - month_ends[m - 1];
+        (m as u8, d as u8)
     }
 
     /// Returns the ordinal day within the year.
@@ -108,7 +120,19 @@ impl Date {
 
     /// Whether this represents a leap year.
     pub fn is_leap_year(&self) -> bool {
-        self.year % 4 == 0 && (self.year % 100 != 0 || self.year % 400 == 0)
+        Self::is_leap(self.year)
+    }
+
+    fn is_leap(year: i32) -> bool {
+        year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+    }
+
+    fn month_ends(year: i32) -> &'static [u16; 13] {
+        if Self::is_leap(year) {
+            &Self::MONTH_END_LEAP
+        } else {
+            &Self::MONTH_END
+        }
     }
 }
 
@@ -161,5 +185,24 @@ mod tests {
         assert_eq!(Date { year: 4, day: 60 }.month(), 2);
         assert_eq!(Date { year: 4, day: 61 }.month(), 3);
         assert_eq!(Date { year: 4, day: 366 }.month(), 12);
+    }
+
+    #[test]
+    fn date_ymd_range() {
+        assert_eq!(Date::from_ymd(2004, 0, 1), Err(Error::RangeExceeded));
+        assert_eq!(Date::from_ymd(2004, 13, 1), Err(Error::RangeExceeded));
+        assert_eq!(Date::from_ymd(2004, 1, 0), Err(Error::RangeExceeded));
+        assert_eq!(Date::from_ymd(2004, 1, 32), Err(Error::RangeExceeded));
+        assert_eq!(Date::from_ymd(2003, 2, 29), Err(Error::RangeExceeded));
+        assert!(Date::from_ymd(2004, 2, 29).is_ok());
+    }
+
+    #[test]
+    fn date_ymd() {
+        assert_eq!(Date::from_ymd(2004, 2, 29).unwrap().day_ord(), 60);
+        assert_eq!(Date::from_ymd(2004, 3, 1).unwrap().day_ord(), 61);
+        assert_eq!(Date::from_ymd(2003, 3, 1).unwrap().day_ord(), 60);
+        assert_eq!(Date::from_ymd(2002, 12, 31).unwrap().day_ord(), 365);
+        assert_eq!(Date::from_ymd(2004, 12, 31).unwrap().day_ord(), 366);
     }
 }
