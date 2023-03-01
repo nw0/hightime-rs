@@ -1,5 +1,5 @@
 #[cfg(feature = "std")]
-use std::time::SystemTime;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::Error;
 
@@ -138,9 +138,9 @@ impl Date {
     }
 
     /// Returns a [Date] from the current system time.
-    #[cfg(feature = "std")]
-    pub fn today() -> Self {
-        todo!()
+    #[cfg(all(feature = "std", feature = "unstable"))]
+    pub fn today() -> Result<Self, Error> {
+        SystemTime::now().try_into()
     }
 
     fn weekday_ord(year: i32, day: i32) -> IsoWeekday {
@@ -211,10 +211,14 @@ impl Date {
     }
 }
 
-#[cfg(feature = "std")]
-impl From<SystemTime> for Date {
-    fn from(_val: SystemTime) -> Self {
-        todo!()
+#[cfg(all(feature = "std", feature = "unstable"))]
+impl TryFrom<SystemTime> for Date {
+    type Error = Error;
+    fn try_from(_val: SystemTime) -> Result<Self, Error> {
+        match SystemTime::now().duration_since(UNIX_EPOCH) {
+            Ok(_) => todo!(),
+            Err(_) => Err(Error::InvalidSystemTime),
+        }
     }
 }
 

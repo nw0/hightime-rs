@@ -8,4 +8,7 @@ pub enum Error {
     UnsupportedYear,
     /// Tried to create a date which is invalid because it is out of range.
     RangeExceeded,
+    /// The system time is invalid (it likely is before the Unix epoch)
+    #[cfg(feature = "std")]
+    InvalidSystemTime,
 }
