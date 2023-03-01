@@ -1,4 +1,4 @@
-.PHONY: check clippy publish
+.PHONY: check clippy test publish
 
 check:
 	cargo check --features=unstable
@@ -8,7 +8,10 @@ clippy:
 	cargo clippy --features=unstable
 	cargo clippy --features=unstable,std
 
-publish: README.md
+test:
+	cargo test --features=unstable,std
+
+publish: README.md test
 	cargo publish -p hightime
 
 README.md: hightime/src/lib.rs
