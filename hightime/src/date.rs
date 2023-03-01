@@ -109,8 +109,32 @@ impl Date {
     ///
     /// An error is returned if the date does not exist or is out of range.
     // TODO: which variant?
-    pub fn from_iso_ywd(_year: i32, _week: u32, _day: Weekday) -> Result<Self, Error> {
-        todo!()
+    pub fn from_iso_ywd(year: i32, week: u32, day: Weekday) -> Result<Self, Error> {
+        if year < -999_999_999 || 999_999_999 < year {
+            return Err(Error::UnsupportedYear);
+        }
+        if week < 1 || week > 53 {
+            return Err(Error::RangeExceeded);
+        }
+        let day_ord =
+            week as i16 * 7 + IsoWeekday::from(day) as i16 - Self::weekday_ord(year, 4) as i16 - 3;
+        eprintln!("{day_ord}");
+        if day_ord < 1 {
+            Ok(Self {
+                year: year - 1,
+                day: (day_ord + Self::days_in_year(year - 1)) as u16,
+            })
+        } else if day_ord > Self::days_in_year(year) {
+            Ok(Self {
+                year: year + 1,
+                day: (day_ord - Self::days_in_year(year)) as u16,
+            })
+        } else {
+            Ok(Self {
+                year,
+                day: day_ord as u16,
+            })
+        }
     }
 
     /// Returns a [Date] from the current system time.
@@ -119,14 +143,18 @@ impl Date {
         todo!()
     }
 
-    /// Returns the weekday.
-    pub fn weekday(&self) -> Weekday {
-        let y = self.year - 1;
-        let d = self.day as i32;
-        (match (d + 5 * (y % 4) + 4 * (y % 100) + 6 * (y % 400)) % 7 {
+    fn weekday_ord(year: i32, day: i32) -> IsoWeekday {
+        let y = year - 1;
+        let d = day as i32;
+        (match ((d + 5 * (y % 4) + 4 * (y % 100) + 6 * (y % 400)) % 7) as u8 {
             0 => 7,
             i => i,
-        } as IsoWeekday)
+        }) as IsoWeekday
+    }
+
+    /// Returns the weekday.
+    pub fn weekday(&self) -> Weekday {
+        Self::weekday_ord(self.year, self.day as i32)
             .try_into()
             .expect("can't be out of range")
     }
@@ -172,6 +200,14 @@ impl Date {
             &Self::MONTH_END_LEAP
         } else {
             &Self::MONTH_END
+        }
+    }
+
+    fn days_in_year(year: i32) -> i16 {
+        if Self::is_leap(year) {
+            366
+        } else {
+            365
         }
     }
 }
@@ -255,6 +291,22 @@ mod tests {
         assert_eq!(
             Date::from_ymd(1200, 4, 28).unwrap().weekday(),
             Weekday::Friday
+        );
+    }
+
+    #[test]
+    fn date_from_iso_weekday() {
+        assert_eq!(
+            Date::from_ymd(1977, 1, 1),
+            Date::from_iso_ywd(1976, 53, Weekday::Saturday)
+        );
+        assert_eq!(
+            Date::from_ymd(2019, 12, 31),
+            Date::from_iso_ywd(2020, 1, Weekday::Tuesday)
+        );
+        assert_eq!(
+            Date::from_ymd(2023, 2, 28),
+            Date::from_iso_ywd(2023, 9, Weekday::Tuesday)
         );
     }
 }
