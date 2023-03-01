@@ -19,16 +19,12 @@
 )]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-#[cfg(feature = "unstable")]
 mod date;
-#[cfg(feature = "unstable")]
 mod error;
 #[cfg(feature = "unstable")]
 mod time;
 
-#[cfg(feature = "unstable")]
 pub use date::{Date, Weekday};
-#[cfg(feature = "unstable")]
 pub use error::Error;
 #[cfg(feature = "unstable")]
 pub use time::{DateTime, FixedOffset, NaiveTime, Offset};
