@@ -83,10 +83,10 @@ impl Date {
     /// An error is returned if the date does not exist, e.g. April 31st of a given year.
     // TODO: which error variant?
     pub fn from_ymd(year: i32, month: u8, day: u8) -> Result<Self, Error> {
-        if year < -999_999_999 || 999_999_999 < year {
+        if !(-999_999_999..=999_999_999).contains(&year) {
             return Err(Error::UnsupportedYear);
         }
-        if month < 1 || 12 < month || day < 1 {
+        if !(1..=12).contains(&month) || day < 1 {
             return Err(Error::RangeExceeded);
         }
         let month_ends = Self::month_ends(year);
@@ -110,15 +110,15 @@ impl Date {
     /// An error is returned if the date does not exist or is out of range.
     // TODO: which variant?
     pub fn from_iso_ywd(year: i32, week: u32, day: Weekday) -> Result<Self, Error> {
-        if year < -999_999_999 || 999_999_999 < year {
+        if !(-999_999_999..=999_999_999).contains(&year) {
             return Err(Error::UnsupportedYear);
         }
-        if week < 1 || week > 53 {
+        if !(1..=53).contains(&week) {
+            // TODO: check week number in year; not every year has 53 weeks
             return Err(Error::RangeExceeded);
         }
         let day_ord =
             week as i16 * 7 + IsoWeekday::from(day) as i16 - Self::weekday_ord(year, 4) as i16 - 3;
-        eprintln!("{day_ord}");
         if day_ord < 1 {
             Ok(Self {
                 year: year - 1,
@@ -145,8 +145,7 @@ impl Date {
 
     fn weekday_ord(year: i32, day: i32) -> IsoWeekday {
         let y = year - 1;
-        let d = day as i32;
-        (match ((d + 5 * (y % 4) + 4 * (y % 100) + 6 * (y % 400)) % 7) as u8 {
+        (match ((day + 5 * (y % 4) + 4 * (y % 100) + 6 * (y % 400)) % 7) as u8 {
             0 => 7,
             i => i,
         }) as IsoWeekday
